@@ -5,22 +5,23 @@ import java.util.Objects;
 public class MyHashMap<K, V> implements MyMap<K, V> {
 
     public static final int RESIZE_MULTIPLIER = 2;
-    private final int initialCapacity = 16;
-    private final int initialThreshold = 12;
-    private int currentCapacity = initialCapacity;
+    public static final int DEFAULT_CAPACITY = 16;
+    public static final int DEFAULT_LOAD_FACTOR = 12;
+    private static final int NULL_KEY_HASH = 0;
+    private int currentCapacity = DEFAULT_CAPACITY;
     private Node<K, V>[] table = new Node[currentCapacity];
-    private int currentThreshold = initialThreshold;
+    private int currentThreshold = DEFAULT_LOAD_FACTOR;
     private final double defaultLoadFactor = 0.75;
     private int size = 0;
 
     @Override
     public void put(K key, V value) {
-        if (table == null || table.length == 0) {
-            currentCapacity = initialCapacity;
+        if (table == null || table.length == NULL_KEY_HASH) {
+            currentCapacity = DEFAULT_CAPACITY;
             currentThreshold = calculateThreshold(currentCapacity, defaultLoadFactor);
             table = (Node<K, V>[]) new Node[currentCapacity];
         }
-        int hash = (key == null) ? 0 : key.hashCode();
+        int hash = (key == null) ? NULL_KEY_HASH : key.hashCode();
         int idx = index(hash, currentCapacity);
         for (Node<K, V> node = table[idx]; node != null; node = node.next) {
             if (node.hash == hash && (node.key == key
@@ -44,7 +45,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (table == null || table.length == 0) {
             return null;
         } else {
-            int hash = (key == null) ? 0 : key.hashCode();
+            int hash = (key == null) ? NULL_KEY_HASH : key.hashCode();
             int idx = index(hash, currentCapacity);
             if (table[idx] == null) {
                 return null;
@@ -105,7 +106,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         private V value;
         private Node<K, V> next;
 
-        Node(int hash, K key, V value) {
+        private Node(int hash, K key, V value) {
             this.hash = hash;
             this.key = key;
             this.value = value;
